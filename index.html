@@ -17,22 +17,13 @@ html, body {
     height: 100%;
 }
 
+/* plain HTML text look, only color kept */
 body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: Courier New, sans-serif;
-    font-size: 6px;
     background: #ffffff;
     color: #0000ff;
-    cursor: none;
 }
 
-.container {
-    text-align: center;
-}
-
-/* main cursor ball - 140% larger */
+/* main cursor ball */
 .cursor {
     position: fixed;
     width: 17px;
@@ -43,7 +34,7 @@ body {
     transform: translate(-50%, -50%);
 }
 
-/* echo trail - same size as cursor */
+/* echo trail */
 .echo {
     position: fixed;
     width: 17px;
@@ -57,7 +48,7 @@ body {
 
 <body>
 
-<main class="container">
+<main>
     <h1>tenniswithouta.net</h1>
     <h2>creative</h2>
 </main>
@@ -67,10 +58,7 @@ body {
 <script>
 const cursor = document.querySelector(".cursor");
 
-/* same density, better feel */
 const COUNT = 18;
-
-/* slightly looser physics = longer trail */
 const SPRING = 0.16;
 const DAMPING = 0.62;
 
@@ -87,8 +75,6 @@ for (let i = 0; i < COUNT; i++) {
         y: 0,
         vx: 0,
         vy: 0,
-
-        /* wider delay spread */
         lag: 0.6 + (i / COUNT) * 5.5
     });
 }
@@ -102,7 +88,6 @@ document.addEventListener("mousemove", (e) => {
 });
 
 function animate() {
-
     cursor.style.left = mouseX + "px";
     cursor.style.top = mouseY + "px";
 
