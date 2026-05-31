@@ -24,7 +24,6 @@ body {
     font-family: Courier New, sans-serif;
     font-size: 6px;
     background: #ffffff;
-    color: #0000ff;
     cursor: none;
 }
 
@@ -68,8 +67,11 @@ body {
 <script>
 const cursor = document.querySelector(".cursor");
 
-// fewer = cleaner + more readable gradient
-const COUNT = 12;
+const COUNT = 14;
+
+// spring physics tuning
+const SPRING = 0.18;
+const DAMPING = 0.72;
 
 const echoes = [];
 
@@ -82,11 +84,14 @@ for (let i = 0; i < COUNT; i++) {
         el,
         x: 0,
         y: 0,
-        lag: 0.06 + i * 0.008 // tight delay stack
+        vx: 0,
+        vy: 0,
+        lag: 1 + i * 0.35 // each layer slightly “heavier”
     });
 }
 
 let mouseX = 0, mouseY = 0;
+let prevMouseX = 0, prevMouseY = 0;
 
 document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
@@ -102,32 +107,47 @@ function animate() {
     cursor.style.left = mouseX + "px";
     cursor.style.top = mouseY + "px";
 
+    // cursor velocity (drives overshoot intensity)
+    const mxVel = mouseX - prevMouseX;
+    const myVel = mouseY - prevMouseY;
+
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+
     for (let i = 0; i < echoes.length; i++) {
         const e = echoes[i];
 
-        e.x += (mouseX - e.x) * e.lag;
-        e.y += (mouseY - e.y) * e.lag;
+        // target offset (creates layered delay)
+        const targetX = mouseX - mxVel * e.lag;
+        const targetY = mouseY - myVel * e.lag;
+
+        // spring physics (this is where overshoot happens)
+        const fx = (targetX - e.x) * SPRING;
+        const fy = (targetY - e.y) * SPRING;
+
+        e.vx = (e.vx + fx) * DAMPING;
+        e.vy = (e.vy + fy) * DAMPING;
+
+        e.x += e.vx;
+        e.y += e.vy;
 
         const dx = mouseX - e.x;
         const dy = mouseY - e.y;
-
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // normalize distance (0 → 1)
-        const t = Math.min(1, dist / 180);
+        const t = Math.min(1, dist / 200);
 
-        // COLOR: blue -> white
-        const r =  lerp(0, 255, t);
-        const g =  lerp(0, 255, t);
+        // blue → white based on distance
+        const r = lerp(0, 255, t);
+        const g = lerp(0, 255, t);
         const b = 255;
 
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
-
         e.el.style.background = `rgb(${r},${g},${b})`;
 
-        // subtle glow so blending feels smoother
-        e.el.style.boxShadow = `0 0 ${t * 10}px rgba(${r},${g},${b},0.6)`;
+        // glow intensifies with motion distance
+        e.el.style.boxShadow = `0 0 ${t * 12}px rgba(${r},${g},${b},0.6)`;
     }
 
     requestAnimationFrame(animate);
