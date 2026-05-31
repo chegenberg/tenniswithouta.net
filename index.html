@@ -37,7 +37,7 @@ body {
     position: fixed;
     width: 10px;
     height: 10px;
-    background: #000000;
+    background: #0000ff;
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
@@ -46,13 +46,11 @@ body {
 /* echo circles */
 .echo {
     position: fixed;
-    width: 18px;
-    height: 18px;
+    width: 14px;
+    height: 14px;
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    background: black;
-    filter: blur(0.3px);
 }
 
 </style>
@@ -70,8 +68,8 @@ body {
 <script>
 const cursor = document.querySelector(".cursor");
 
-// fewer but tighter echoes (key change)
-const COUNT = 10;
+// fewer = cleaner + more readable gradient
+const COUNT = 12;
 
 const echoes = [];
 
@@ -84,7 +82,7 @@ for (let i = 0; i < COUNT; i++) {
         el,
         x: 0,
         y: 0,
-        lag: 0.08 + i * 0.01 // SHORTER delay chain
+        lag: 0.06 + i * 0.008 // tight delay stack
     });
 }
 
@@ -95,9 +93,12 @@ document.addEventListener("mousemove", (e) => {
     mouseY = e.clientY;
 });
 
+function lerp(a, b, t) {
+    return a + (b - a) * t;
+}
+
 function animate() {
 
-    // main cursor
     cursor.style.left = mouseX + "px";
     cursor.style.top = mouseY + "px";
 
@@ -112,26 +113,21 @@ function animate() {
 
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // brightness mapping:
-        // farther = brighter (your request)
-        const brightness = Math.min(1, dist / 120);
+        // normalize distance (0 → 1)
+        const t = Math.min(1, dist / 180);
+
+        // COLOR: blue -> white
+        const r =  lerp(0, 255, t);
+        const g =  lerp(0, 255, t);
+        const b = 255;
 
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
 
-        // size + glow based on distance
-        const size = 6 + i * 1.2;
+        e.el.style.background = `rgb(${r},${g},${b})`;
 
-        e.el.style.width = size + "px";
-        e.el.style.height = size + "px";
-
-        e.el.style.opacity = brightness * 0.9;
-
-        e.el.style.boxShadow =
-            `0 0 ${brightness * 12}px rgba(0,0,0,${brightness * 0.6})`;
-
-        // slight scaling depth feel
-        e.el.style.transform = `translate(-50%, -50%) scale(${1 + brightness * 0.3})`;
+        // subtle glow so blending feels smoother
+        e.el.style.boxShadow = `0 0 ${t * 10}px rgba(${r},${g},${b},0.6)`;
     }
 
     requestAnimationFrame(animate);
