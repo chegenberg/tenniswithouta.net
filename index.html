@@ -24,7 +24,7 @@ body {
     font-family: Courier New, sans-serif;
     font-size: 6px;
     background: #ffffff;
-    color: #0000ff; /* PURE BLUE TEXT */
+    color: #0000ff;
     cursor: none;
 }
 
@@ -32,27 +32,26 @@ body {
     text-align: center;
 }
 
-/* main cursor ball */
+/* main cursor ball - 140% larger */
 .cursor {
     position: fixed;
-    width: 12px;
-    height: 12px;
-    background: #ffff00; /* YELLOW */
+    width: 17px;
+    height: 17px;
+    background: #ffff00;
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
 }
 
-/* echo trail */
+/* echo trail - same size as cursor */
 .echo {
     position: fixed;
-    width: 12px;
-    height: 12px;
+    width: 17px;
+    height: 17px;
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
 }
-
 </style>
 </head>
 
@@ -89,7 +88,7 @@ for (let i = 0; i < COUNT; i++) {
         vx: 0,
         vy: 0,
 
-        /* 🔥 key change: MUCH wider delay spread */
+        /* wider delay spread */
         lag: 0.6 + (i / COUNT) * 5.5
     });
 }
@@ -101,10 +100,6 @@ document.addEventListener("mousemove", (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
 });
-
-function lerp(a, b, t) {
-    return a + (b - a) * t;
-}
 
 function animate() {
 
@@ -141,11 +136,8 @@ function animate() {
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
 
-        /* soft yellow fade in trail (optional but subtle nice touch) */
         e.el.style.background = `rgb(255, ${255 - t * 80}, 0)`;
-
         e.el.style.opacity = 0.95 - (i / COUNT) * 0.6;
-
         e.el.style.boxShadow = `0 0 ${t * 10}px rgba(255,200,0,0.5)`;
     }
 
