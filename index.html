@@ -25,11 +25,11 @@ body {
     font-size: 6px;
     background: #ffffff;
     cursor: none;
+    color: #0000ff;
 }
 
 .container {
     text-align: center;
-    color: #0000ff; /* PURE BLUE TEXT */
 }
 
 .cursor {
@@ -40,7 +40,7 @@ body {
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 14px rgba(255, 220, 0, 0.9);
+    box-shadow: 0 0 10px rgb(255, 230, 0);
 }
 
 .echo {
@@ -49,7 +49,10 @@ body {
     height: 24px;
     border-radius: 50%;
     pointer-events: none;
+
+    /* IMPORTANT: removes subpixel blur artifacts */
     transform: translate(-50%, -50%);
+    will-change: transform;
 }
 </style>
 </head>
@@ -121,25 +124,24 @@ function animate() {
         e.x += e.vx;
         e.y += e.vy;
 
+        // IMPORTANT: snap to pixels (removes size shimmer illusion)
+        const x = Math.round(e.x);
+        const y = Math.round(e.y);
+
         const t = i / (COUNT - 1);
 
-        // 🔥 HARD COLOR STEPPING (no alpha blending issues)
+        // PURE COLOR GRADIENT (no alpha anywhere)
         const r = 255;
-        const g = Math.floor(255 - (180 * t)); // fades down green only
+        const g = Math.floor(255 - (200 * t));
         const b = 0;
 
-        e.el.style.left = e.x + "px";
-        e.el.style.top = e.y + "px";
+        e.el.style.left = x + "px";
+        e.el.style.top = y + "px";
 
-        e.el.style.background = `rgb(${r},${g},${b})`;
+        e.el.style.backgroundColor = `rgb(${r},${g},${b})`;
 
-        // keep opacity constant to avoid stacking darkening
-        e.el.style.opacity = 1;
-
-        e.el.style.boxShadow = `0 0 ${10 * (1 - t)}px rgba(255, 200, 0, ${0.8 * (1 - t)})`;
+        // no opacity, no shadow = no stacking artifacts
     }
-
-    requestAnimationFrame(animate);
 }
 
 animate();
