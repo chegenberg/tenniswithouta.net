@@ -32,9 +32,9 @@ body {
     text-align: center;
 }
 
-/* ===== CURSOR SIZE (200%) ===== */
+/* base cursor style */
 .cursor,
-.cursor-glitch {
+.echo {
     position: fixed;
     width: 36px;
     height: 36px;
@@ -42,8 +42,9 @@ body {
     transform: translate(-50%, -50%);
 }
 
-/* MAIN ARROW */
-.cursor::before {
+/* black arrow shape */
+.cursor::before,
+.echo::before {
     content: "";
     position: absolute;
     width: 100%;
@@ -60,26 +61,9 @@ body {
     );
 }
 
-/* GLITCH ARROWS */
-.cursor-glitch::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    clip-path: polygon(
-        0 0,
-        0 100%,
-        30% 70%,
-        55% 95%,
-        70% 80%,
-        45% 55%,
-        100% 55%
-    );
+.echo {
+    opacity: 0.7;
 }
-
-/* glitch coloring */
-.g1::before { background: rgba(0,0,0,0.6); }
-.g2::before { background: rgba(0,0,0,0.3); }
 
 </style>
 </head>
@@ -92,39 +76,60 @@ body {
 </main>
 
 <div class="cursor"></div>
-<div class="cursor-glitch g1"></div>
-<div class="cursor-glitch g2"></div>
 
 <script>
 const cursor = document.querySelector(".cursor");
-const g1 = document.querySelector(".g1");
-const g2 = document.querySelector(".g2");
 
-let x = 0, y = 0;
-let x1 = 0, y1 = 0;
-let x2 = 0, y2 = 0;
+// number of echoes (safe range: 8–20)
+const COUNT = 14;
+
+// create echo elements once (important for performance)
+const echoes = [];
+
+for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement("div");
+    el.className = "echo";
+    document.body.appendChild(el);
+
+    echoes.push({
+        el,
+        x: 0,
+        y: 0,
+        lag: 0.05 + (i * 0.015), // different delay per echo
+    });
+}
+
+let mouseX = 0, mouseY = 0;
 
 document.addEventListener("mousemove", (e) => {
-    x = e.clientX;
-    y = e.clientY;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
 });
 
 function animate() {
 
-    cursor.style.left = x + "px";
-    cursor.style.top = y + "px";
+    // main cursor (sharp)
+    cursor.style.left = mouseX + "px";
+    cursor.style.top = mouseY + "px";
 
-    x1 += (x - x1) * 0.25;
-    y1 += (y - y1) * 0.25;
+    // echoes (multi-delay trail)
+    for (let i = 0; i < echoes.length; i++) {
+        const e = echoes[i];
 
-    g1.style.left = (x1 + (Math.random() - 0.5) * 4) + "px";
-    g1.style.top  = (y1 + (Math.random() - 0.5) * 4) + "px";
+        e.x += (mouseX - e.x) * e.lag;
+        e.y += (mouseY - e.y) * e.lag;
 
-    x2 += (x - x2) * 0.12;
-    y2 += (y - y2) * 0.12;
+        // tiny jitter for glitch feel
+        const jx = (Math.random() - 0.5) * (i * 0.4);
+        const jy = (Math.random() - 0.5) * (i * 0.4);
 
-    g2.style.left = (x2 + (Math.random() - 0.5) * 8) + "px";
-    g2.style.top  = (y2 + (Math.random() - 0.5) * 8) + "px";
+        e.el.style.left = (e.x + jx) + "px";
+        e.el.style.top  = (e.y + jy) + "px";
+
+        // fade out further echoes
+        e.el.style.opacity = 0.9 - (i / COUNT);
+        e.el.style.transform = "translate(-50%, -50%) scale(" + (1 - i * 0.03) + ")";
+    }
 
     requestAnimationFrame(animate);
 }
