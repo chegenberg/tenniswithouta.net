@@ -13,6 +13,7 @@
             box-sizing: border-box;
         }
 
+        /* Base */
         html,
         body {
             width: 100%;
@@ -36,27 +37,27 @@
             text-align: center;
         }
 
-        /* Main cursor */
+        /* Cursor core */
         .cursor {
             position: fixed;
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             background: #0000ff;
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
         }
 
-        /* trailing ghost */
+        /* trailing ring */
         .cursor-trail {
             position: fixed;
-            width: 20px;
-            height: 20px;
+            width: 18px;
+            height: 18px;
             border: 1px solid #0000ff;
             border-radius: 50%;
             pointer-events: none;
             transform: translate(-50%, -50%);
-            opacity: 0.5;
+            opacity: 0.6;
         }
     </style>
 </head>
@@ -87,9 +88,8 @@
         });
 
         function animate() {
-            // smooth lag behind cursor
-            trailX += (mouseX - trailX) * 0.15;
-            trailY += (mouseY - trailY) * 0.15;
+            trailX += (mouseX - trailX) * 0.12;
+            trailY += (mouseY - trailY) * 0.12;
 
             trail.style.left = trailX + "px";
             trail.style.top = trailY + "px";
