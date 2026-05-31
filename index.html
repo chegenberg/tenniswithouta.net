@@ -29,6 +29,7 @@ body {
 
 .container {
     text-align: center;
+    color: #0000ff; /* PURE BLUE TEXT */
 }
 
 .cursor {
@@ -39,7 +40,7 @@ body {
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
-    box-shadow: 0 0 12px rgba(255, 200, 0, 0.8);
+    box-shadow: 0 0 14px rgba(255, 220, 0, 0.9);
 }
 
 .echo {
@@ -120,16 +121,22 @@ function animate() {
         e.x += e.vx;
         e.y += e.vy;
 
-        const p = i / (COUNT - 1);
+        const t = i / (COUNT - 1);
+
+        // 🔥 HARD COLOR STEPPING (no alpha blending issues)
+        const r = 255;
+        const g = Math.floor(255 - (180 * t)); // fades down green only
+        const b = 0;
 
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
 
-        const brightness = 1 - p;
+        e.el.style.background = `rgb(${r},${g},${b})`;
 
-        e.el.style.background = `rgb(255, ${255 * brightness}, 0)`;
-        e.el.style.opacity = 1 - p * 0.85;
-        e.el.style.boxShadow = `0 0 ${8 * (1 - p)}px rgba(255, 200, 0, ${0.6 * (1 - p)})`;
+        // keep opacity constant to avoid stacking darkening
+        e.el.style.opacity = 1;
+
+        e.el.style.boxShadow = `0 0 ${10 * (1 - t)}px rgba(255, 200, 0, ${0.8 * (1 - t)})`;
     }
 
     requestAnimationFrame(animate);
