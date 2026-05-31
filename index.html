@@ -1,66 +1,153 @@
-font-family: Courier New, sans-serif;
-font-size: 6px;
-background: #ffffff;
-    color: #0000ff; /* PURE BLUE TEXT */
-cursor: none;
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tenniswithouta.net</title>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    width: 100%;
+    height: 100%;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Courier New, sans-serif;
+    font-size: 6px;
+    background: #ffffff;
+    cursor: none;
 }
 
 .container {
-text-align: center;
+    text-align: center;
 }
 
-/* main cursor ball */
 /* 🔥 DOUBLED CURSOR SIZE */
 .cursor {
-position: fixed;
-    width: 12px;
-    height: 12px;
-    background: #ffff00; /* YELLOW */
+    position: fixed;
     width: 24px;
     height: 24px;
     background: #ffff00;
-border-radius: 50%;
-pointer-events: none;
-transform: translate(-50%, -50%);
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
 }
 
-/* echo trail */
 /* echoes scaled to match */
 .echo {
-position: fixed;
-    width: 12px;
-    height: 12px;
+    position: fixed;
     width: 24px;
     height: 24px;
-border-radius: 50%;
-pointer-events: none;
-transform: translate(-50%, -50%);
-@@ -68,10 +67,8 @@ <h2>creative</h2>
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
+
+</style>
+</head>
+
+<body>
+
+<main class="container">
+    <h1>tenniswithouta.net</h1>
+    <h2>creative</h2>
+</main>
+
+<div class="cursor"></div>
+
 <script>
 const cursor = document.querySelector(".cursor");
 
-/* same density, better feel */
 const COUNT = 18;
 
-/* slightly looser physics = longer trail */
 const SPRING = 0.16;
 const DAMPING = 0.62;
 
-@@ -88,8 +85,6 @@ <h2>creative</h2>
-y: 0,
-vx: 0,
-vy: 0,
+const echoes = [];
 
-        /* 🔥 key change: MUCH wider delay spread */
-lag: 0.6 + (i / COUNT) * 5.5
-});
+for (let i = 0; i < COUNT; i++) {
+    const el = document.createElement("div");
+    el.className = "echo";
+    document.body.appendChild(el);
+
+    echoes.push({
+        el,
+        x: 0,
+        y: 0,
+        vx: 0,
+        vy: 0,
+        lag: 0.6 + (i / COUNT) * 5.5
+    });
 }
-@@ -141,8 +136,7 @@ <h2>creative</h2>
-e.el.style.left = e.x + "px";
-e.el.style.top = e.y + "px";
 
-        /* soft yellow fade in trail (optional but subtle nice touch) */
-        e.el.style.background = `rgb(255, ${255 - t * 80}, 0)`;
+let mouseX = 0, mouseY = 0;
+let prevMouseX = 0, prevMouseY = 0;
+
+document.addEventListener("mousemove", (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
+
+function lerp(a, b, t) {
+    return a + (b - a) * t;
+}
+
+function animate() {
+
+    cursor.style.left = mouseX + "px";
+    cursor.style.top = mouseY + "px";
+
+    const mxVel = mouseX - prevMouseX;
+    const myVel = mouseY - prevMouseY;
+
+    prevMouseX = mouseX;
+    prevMouseY = mouseY;
+
+    for (let i = 0; i < echoes.length; i++) {
+        const e = echoes[i];
+
+        const targetX = mouseX - mxVel * e.lag;
+        const targetY = mouseY - myVel * e.lag;
+
+        const fx = (targetX - e.x) * SPRING;
+        const fy = (targetY - e.y) * SPRING;
+
+        e.vx = (e.vx + fx) * DAMPING;
+        e.vy = (e.vy + fy) * DAMPING;
+
+        e.x += e.vx;
+        e.y += e.vy;
+
+        const dx = mouseX - e.x;
+        const dy = mouseY - e.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        const t = Math.min(1, dist / 220);
+
+        e.el.style.left = e.x + "px";
+        e.el.style.top = e.y + "px";
+
         e.el.style.background = `rgb(${255 * t},${255 * t},0)`;
 
-e.el.style.opacity = 0.95 - (i / COUNT) * 0.6;
+        e.el.style.opacity = 0.95 - (i / COUNT) * 0.6;
+
+        e.el.style.boxShadow = `0 0 ${t * 10}px rgba(255,200,0,0.5)`;
+    }
+
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
+
+</body>
+</html>
