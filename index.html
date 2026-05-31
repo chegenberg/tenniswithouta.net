@@ -24,6 +24,7 @@ body {
     font-family: Courier New, sans-serif;
     font-size: 6px;
     background: #ffffff;
+    color: #0000ff; /* PURE BLUE TEXT */
     cursor: none;
 }
 
@@ -31,16 +32,18 @@ body {
     text-align: center;
 }
 
+/* main cursor ball */
 .cursor {
     position: fixed;
-    width: 10px;
-    height: 10px;
-    background: #0000ff;
+    width: 12px;
+    height: 12px;
+    background: #ffff00; /* YELLOW */
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
 }
 
+/* echo trail */
 .echo {
     position: fixed;
     width: 12px;
@@ -65,12 +68,12 @@ body {
 <script>
 const cursor = document.querySelector(".cursor");
 
-/* ⚡ 80 echoes */
-const COUNT = 80;
+/* same density, better feel */
+const COUNT = 18;
 
-/* slightly softer physics to keep FPS stable */
-const SPRING = 0.14;
-const DAMPING = 0.68;
+/* slightly looser physics = longer trail */
+const SPRING = 0.16;
+const DAMPING = 0.62;
 
 const echoes = [];
 
@@ -86,8 +89,8 @@ for (let i = 0; i < COUNT; i++) {
         vx: 0,
         vy: 0,
 
-        /* tighter early spread, longer tail at end */
-        lag: 0.8 + (i / COUNT) * 3.2
+        /* 🔥 key change: MUCH wider delay spread */
+        lag: 0.6 + (i / COUNT) * 5.5
     });
 }
 
@@ -133,19 +136,17 @@ function animate() {
         const dy = mouseY - e.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        const t = Math.min(1, dist / 260);
-
-        const r = lerp(0, 255, t);
-        const g = lerp(0, 255, t);
-        const b = 255;
+        const t = Math.min(1, dist / 220);
 
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
 
-        e.el.style.background = `rgb(${r},${g},${b})`;
-        e.el.style.opacity = 0.9 - (i / COUNT);
+        /* soft yellow fade in trail (optional but subtle nice touch) */
+        e.el.style.background = `rgb(255, ${255 - t * 80}, 0)`;
 
-        e.el.style.boxShadow = `0 0 ${t * 8}px rgba(${r},${g},${b},0.5)`;
+        e.el.style.opacity = 0.95 - (i / COUNT) * 0.6;
+
+        e.el.style.boxShadow = `0 0 ${t * 10}px rgba(255,200,0,0.5)`;
     }
 
     requestAnimationFrame(animate);
