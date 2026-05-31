@@ -32,37 +32,27 @@ body {
     text-align: center;
 }
 
-/* base cursor style */
-.cursor,
-.echo {
+/* main cursor */
+.cursor {
     position: fixed;
-    width: 36px;
-    height: 36px;
+    width: 10px;
+    height: 10px;
+    background: #000000;
+    border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
 }
 
-/* black arrow shape */
-.cursor::before,
-.echo::before {
-    content: "";
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    background: #000000;
-    clip-path: polygon(
-        0 0,
-        0 100%,
-        30% 70%,
-        55% 95%,
-        70% 80%,
-        45% 55%,
-        100% 55%
-    );
-}
-
+/* echo circles */
 .echo {
-    opacity: 0.7;
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+    background: black;
+    filter: blur(0.3px);
 }
 
 </style>
@@ -80,10 +70,9 @@ body {
 <script>
 const cursor = document.querySelector(".cursor");
 
-// number of echoes (safe range: 8–20)
-const COUNT = 14;
+// fewer but tighter echoes (key change)
+const COUNT = 10;
 
-// create echo elements once (important for performance)
 const echoes = [];
 
 for (let i = 0; i < COUNT; i++) {
@@ -95,7 +84,7 @@ for (let i = 0; i < COUNT; i++) {
         el,
         x: 0,
         y: 0,
-        lag: 0.05 + (i * 0.015), // different delay per echo
+        lag: 0.08 + i * 0.01 // SHORTER delay chain
     });
 }
 
@@ -108,27 +97,41 @@ document.addEventListener("mousemove", (e) => {
 
 function animate() {
 
-    // main cursor (sharp)
+    // main cursor
     cursor.style.left = mouseX + "px";
     cursor.style.top = mouseY + "px";
 
-    // echoes (multi-delay trail)
     for (let i = 0; i < echoes.length; i++) {
         const e = echoes[i];
 
         e.x += (mouseX - e.x) * e.lag;
         e.y += (mouseY - e.y) * e.lag;
 
-        // tiny jitter for glitch feel
-        const jx = (Math.random() - 0.5) * (i * 0.4);
-        const jy = (Math.random() - 0.5) * (i * 0.4);
+        const dx = mouseX - e.x;
+        const dy = mouseY - e.y;
 
-        e.el.style.left = (e.x + jx) + "px";
-        e.el.style.top  = (e.y + jy) + "px";
+        const dist = Math.sqrt(dx * dx + dy * dy);
 
-        // fade out further echoes
-        e.el.style.opacity = 0.9 - (i / COUNT);
-        e.el.style.transform = "translate(-50%, -50%) scale(" + (1 - i * 0.03) + ")";
+        // brightness mapping:
+        // farther = brighter (your request)
+        const brightness = Math.min(1, dist / 120);
+
+        e.el.style.left = e.x + "px";
+        e.el.style.top = e.y + "px";
+
+        // size + glow based on distance
+        const size = 6 + i * 1.2;
+
+        e.el.style.width = size + "px";
+        e.el.style.height = size + "px";
+
+        e.el.style.opacity = brightness * 0.9;
+
+        e.el.style.boxShadow =
+            `0 0 ${brightness * 12}px rgba(0,0,0,${brightness * 0.6})`;
+
+        // slight scaling depth feel
+        e.el.style.transform = `translate(-50%, -50%) scale(${1 + brightness * 0.3})`;
     }
 
     requestAnimationFrame(animate);
