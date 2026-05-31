@@ -29,35 +29,10 @@
             font-size: 6px;
             background: #ffffff;
             color: #0000ff;
-
-            cursor: none; /* hide default cursor */
         }
 
         .container {
             text-align: center;
-        }
-
-        /* Cursor core */
-        .cursor {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: #0000ff;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-        }
-
-        /* trailing ring */
-        .cursor-trail {
-            position: fixed;
-            width: 18px;
-            height: 18px;
-            border: 1px solid #0000ff;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            opacity: 0.6;
         }
     </style>
 </head>
@@ -67,38 +42,6 @@
         <h1>tenniswithouta.net</h1>
         <h2>creative</h2>
     </main>
-
-    <!-- cursor elements -->
-    <div class="cursor"></div>
-    <div class="cursor-trail"></div>
-
-    <script>
-        const cursor = document.querySelector(".cursor");
-        const trail = document.querySelector(".cursor-trail");
-
-        let mouseX = 0, mouseY = 0;
-        let trailX = 0, trailY = 0;
-
-        document.addEventListener("mousemove", (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-
-            cursor.style.left = mouseX + "px";
-            cursor.style.top = mouseY + "px";
-        });
-
-        function animate() {
-            trailX += (mouseX - trailX) * 0.12;
-            trailY += (mouseY - trailY) * 0.12;
-
-            trail.style.left = trailX + "px";
-            trail.style.top = trailY + "px";
-
-            requestAnimationFrame(animate);
-        }
-
-        animate();
-    </script>
 
 </body>
 </html>
