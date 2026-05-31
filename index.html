@@ -31,7 +31,6 @@ body {
     text-align: center;
 }
 
-/* main cursor */
 .cursor {
     position: fixed;
     width: 10px;
@@ -42,11 +41,10 @@ body {
     transform: translate(-50%, -50%);
 }
 
-/* echo circles */
 .echo {
     position: fixed;
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
@@ -67,11 +65,12 @@ body {
 <script>
 const cursor = document.querySelector(".cursor");
 
-const COUNT = 14;
+/* ⚡ 80 echoes */
+const COUNT = 80;
 
-// spring physics tuning
-const SPRING = 0.18;
-const DAMPING = 0.72;
+/* slightly softer physics to keep FPS stable */
+const SPRING = 0.14;
+const DAMPING = 0.68;
 
 const echoes = [];
 
@@ -86,7 +85,9 @@ for (let i = 0; i < COUNT; i++) {
         y: 0,
         vx: 0,
         vy: 0,
-        lag: 1 + i * 0.35 // each layer slightly “heavier”
+
+        /* tighter early spread, longer tail at end */
+        lag: 0.8 + (i / COUNT) * 3.2
     });
 }
 
@@ -107,7 +108,6 @@ function animate() {
     cursor.style.left = mouseX + "px";
     cursor.style.top = mouseY + "px";
 
-    // cursor velocity (drives overshoot intensity)
     const mxVel = mouseX - prevMouseX;
     const myVel = mouseY - prevMouseY;
 
@@ -117,11 +117,9 @@ function animate() {
     for (let i = 0; i < echoes.length; i++) {
         const e = echoes[i];
 
-        // target offset (creates layered delay)
         const targetX = mouseX - mxVel * e.lag;
         const targetY = mouseY - myVel * e.lag;
 
-        // spring physics (this is where overshoot happens)
         const fx = (targetX - e.x) * SPRING;
         const fy = (targetY - e.y) * SPRING;
 
@@ -135,19 +133,19 @@ function animate() {
         const dy = mouseY - e.y;
         const dist = Math.sqrt(dx * dx + dy * dy);
 
-        const t = Math.min(1, dist / 200);
+        const t = Math.min(1, dist / 260);
 
-        // blue → white based on distance
         const r = lerp(0, 255, t);
         const g = lerp(0, 255, t);
         const b = 255;
 
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
-        e.el.style.background = `rgb(${r},${g},${b})`;
 
-        // glow intensifies with motion distance
-        e.el.style.boxShadow = `0 0 ${t * 12}px rgba(${r},${g},${b},0.6)`;
+        e.el.style.background = `rgb(${r},${g},${b})`;
+        e.el.style.opacity = 0.9 - (i / COUNT);
+
+        e.el.style.boxShadow = `0 0 ${t * 8}px rgba(${r},${g},${b},0.5)`;
     }
 
     requestAnimationFrame(animate);
