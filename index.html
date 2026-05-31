@@ -6,16 +6,13 @@
     <title>tenniswithouta.net</title>
 
     <style>
-        /* Reset */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        /* Base */
-        html,
-        body {
+        html, body {
             width: 100%;
             height: 100%;
         }
@@ -29,19 +26,90 @@
             font-size: 6px;
             background: #ffffff;
             color: #0000ff;
+
+            cursor: none;
         }
 
         .container {
             text-align: center;
         }
+
+        /* MAIN CURSOR */
+        .cursor {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            background: #0000ff;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+        }
+
+        /* GLITCH LAYERS */
+        .cursor-glitch {
+            position: fixed;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            mix-blend-mode: multiply;
+        }
+
+        .g1 { background: rgba(0,0,255,0.6); }
+        .g2 { background: rgba(0,0,255,0.35); }
     </style>
 </head>
+
 <body>
 
     <main class="container">
         <h1>tenniswithouta.net</h1>
         <h2>creative</h2>
     </main>
+
+    <div class="cursor"></div>
+    <div class="cursor-glitch g1"></div>
+    <div class="cursor-glitch g2"></div>
+
+    <script>
+        const cursor = document.querySelector(".cursor");
+        const g1 = document.querySelector(".g1");
+        const g2 = document.querySelector(".g2");
+
+        let x = 0, y = 0;
+        let x1 = 0, y1 = 0;
+        let x2 = 0, y2 = 0;
+
+        document.addEventListener("mousemove", (e) => {
+            x = e.clientX;
+            y = e.clientY;
+        });
+
+        function animate() {
+            // main cursor (fast, sharp)
+            cursor.style.left = x + "px";
+            cursor.style.top = y + "px";
+
+            // glitch layer 1 (lag + small jitter)
+            x1 += (x - x1) * 0.25;
+            y1 += (y - y1) * 0.25;
+
+            g1.style.left = (x1 + (Math.random() - 0.5) * 6) + "px";
+            g1.style.top  = (y1 + (Math.random() - 0.5) * 6) + "px";
+
+            // glitch layer 2 (more lag + stronger jitter)
+            x2 += (x - x2) * 0.12;
+            y2 += (y - y2) * 0.12;
+
+            g2.style.left = (x2 + (Math.random() - 0.5) * 10) + "px";
+            g2.style.top  = (y2 + (Math.random() - 0.5) * 10) + "px";
+
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+    </script>
 
 </body>
 </html>
