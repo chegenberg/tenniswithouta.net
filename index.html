@@ -32,22 +32,23 @@ body {
     text-align: center;
 }
 
-/* BASE ARROW */
-.cursor {
+/* ===== CURSOR SIZE (200%) ===== */
+.cursor,
+.cursor-glitch {
     position: fixed;
-    width: 18px;
-    height: 18px;
+    width: 36px;
+    height: 36px;
     pointer-events: none;
     transform: translate(-50%, -50%);
 }
 
-/* draw arrow using CSS */
+/* MAIN ARROW */
 .cursor::before {
     content: "";
     position: absolute;
     width: 100%;
     height: 100%;
-    background: #0000ff;
+    background: #000000;
     clip-path: polygon(
         0 0,
         0 100%,
@@ -59,15 +60,7 @@ body {
     );
 }
 
-/* GLITCH LAYERS */
-.cursor-glitch {
-    position: fixed;
-    width: 18px;
-    height: 18px;
-    pointer-events: none;
-    transform: translate(-50%, -50%);
-}
-
+/* GLITCH ARROWS */
 .cursor-glitch::before {
     content: "";
     position: absolute;
@@ -84,8 +77,9 @@ body {
     );
 }
 
-.g1::before { background: rgba(0,0,255,0.6); }
-.g2::before { background: rgba(0,0,255,0.3); }
+/* glitch coloring */
+.g1::before { background: rgba(0,0,0,0.6); }
+.g2::before { background: rgba(0,0,0,0.3); }
 
 </style>
 </head>
@@ -117,18 +111,15 @@ document.addEventListener("mousemove", (e) => {
 
 function animate() {
 
-    // main arrow (sharp)
     cursor.style.left = x + "px";
     cursor.style.top = y + "px";
 
-    // first echo
     x1 += (x - x1) * 0.25;
     y1 += (y - y1) * 0.25;
 
     g1.style.left = (x1 + (Math.random() - 0.5) * 4) + "px";
     g1.style.top  = (y1 + (Math.random() - 0.5) * 4) + "px";
 
-    // second echo (slower + more unstable)
     x2 += (x - x2) * 0.12;
     y2 += (y - y2) * 0.12;
 
