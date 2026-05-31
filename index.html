@@ -24,6 +24,7 @@ body {
     font-family: Courier New, sans-serif;
     font-size: 6px;
     background: #ffffff;
+    color: #0000ff; /* PURE BLUE TEXT */
     cursor: none;
 }
 
@@ -31,22 +32,22 @@ body {
     text-align: center;
 }
 
-/* 🔥 DOUBLED CURSOR SIZE */
+/* main cursor ball */
 .cursor {
     position: fixed;
-    width: 24px;
-    height: 24px;
-    background: #ffff00;
+    width: 12px;
+    height: 12px;
+    background: #ffff00; /* YELLOW */
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
 }
 
-/* echoes scaled to match */
+/* echo trail */
 .echo {
     position: fixed;
-    width: 24px;
-    height: 24px;
+    width: 12px;
+    height: 12px;
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
@@ -67,8 +68,10 @@ body {
 <script>
 const cursor = document.querySelector(".cursor");
 
+/* same density, better feel */
 const COUNT = 18;
 
+/* slightly looser physics = longer trail */
 const SPRING = 0.16;
 const DAMPING = 0.62;
 
@@ -85,6 +88,8 @@ for (let i = 0; i < COUNT; i++) {
         y: 0,
         vx: 0,
         vy: 0,
+
+        /* 🔥 key change: MUCH wider delay spread */
         lag: 0.6 + (i / COUNT) * 5.5
     });
 }
@@ -136,7 +141,8 @@ function animate() {
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
 
-        e.el.style.background = `rgb(${255 * t},${255 * t},0)`;
+        /* soft yellow fade in trail (optional but subtle nice touch) */
+        e.el.style.background = `rgb(255, ${255 - t * 80}, 0)`;
 
         e.el.style.opacity = 0.95 - (i / COUNT) * 0.6;
 
