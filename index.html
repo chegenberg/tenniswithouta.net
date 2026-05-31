@@ -1,115 +1,145 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>tenniswithouta.net</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>tenniswithouta.net</title>
 
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
 
-        html, body {
-            width: 100%;
-            height: 100%;
-        }
+html, body {
+    width: 100%;
+    height: 100%;
+}
 
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Courier New, sans-serif;
+    font-size: 6px;
+    background: #ffffff;
+    color: #0000ff;
+    cursor: none;
+}
 
-            font-family: Courier New, sans-serif;
-            font-size: 6px;
-            background: #ffffff;
-            color: #0000ff;
+.container {
+    text-align: center;
+}
 
-            cursor: none;
-        }
+/* BASE ARROW */
+.cursor {
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
 
-        .container {
-            text-align: center;
-        }
+/* draw arrow using CSS */
+.cursor::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #0000ff;
+    clip-path: polygon(
+        0 0,
+        0 100%,
+        30% 70%,
+        55% 95%,
+        70% 80%,
+        45% 55%,
+        100% 55%
+    );
+}
 
-        /* MAIN CURSOR */
-        .cursor {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            background: #0000ff;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-        }
+/* GLITCH LAYERS */
+.cursor-glitch {
+    position: fixed;
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+    transform: translate(-50%, -50%);
+}
 
-        /* GLITCH LAYERS */
-        .cursor-glitch {
-            position: fixed;
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            mix-blend-mode: multiply;
-        }
+.cursor-glitch::before {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    clip-path: polygon(
+        0 0,
+        0 100%,
+        30% 70%,
+        55% 95%,
+        70% 80%,
+        45% 55%,
+        100% 55%
+    );
+}
 
-        .g1 { background: rgba(0,0,255,0.6); }
-        .g2 { background: rgba(0,0,255,0.35); }
-    </style>
+.g1::before { background: rgba(0,0,255,0.6); }
+.g2::before { background: rgba(0,0,255,0.3); }
+
+</style>
 </head>
 
 <body>
 
-    <main class="container">
-        <h1>tenniswithouta.net</h1>
-        <h2>creative</h2>
-    </main>
+<main class="container">
+    <h1>tenniswithouta.net</h1>
+    <h2>creative</h2>
+</main>
 
-    <div class="cursor"></div>
-    <div class="cursor-glitch g1"></div>
-    <div class="cursor-glitch g2"></div>
+<div class="cursor"></div>
+<div class="cursor-glitch g1"></div>
+<div class="cursor-glitch g2"></div>
 
-    <script>
-        const cursor = document.querySelector(".cursor");
-        const g1 = document.querySelector(".g1");
-        const g2 = document.querySelector(".g2");
+<script>
+const cursor = document.querySelector(".cursor");
+const g1 = document.querySelector(".g1");
+const g2 = document.querySelector(".g2");
 
-        let x = 0, y = 0;
-        let x1 = 0, y1 = 0;
-        let x2 = 0, y2 = 0;
+let x = 0, y = 0;
+let x1 = 0, y1 = 0;
+let x2 = 0, y2 = 0;
 
-        document.addEventListener("mousemove", (e) => {
-            x = e.clientX;
-            y = e.clientY;
-        });
+document.addEventListener("mousemove", (e) => {
+    x = e.clientX;
+    y = e.clientY;
+});
 
-        function animate() {
-            // main cursor (fast, sharp)
-            cursor.style.left = x + "px";
-            cursor.style.top = y + "px";
+function animate() {
 
-            // glitch layer 1 (lag + small jitter)
-            x1 += (x - x1) * 0.25;
-            y1 += (y - y1) * 0.25;
+    // main arrow (sharp)
+    cursor.style.left = x + "px";
+    cursor.style.top = y + "px";
 
-            g1.style.left = (x1 + (Math.random() - 0.5) * 6) + "px";
-            g1.style.top  = (y1 + (Math.random() - 0.5) * 6) + "px";
+    // first echo
+    x1 += (x - x1) * 0.25;
+    y1 += (y - y1) * 0.25;
 
-            // glitch layer 2 (more lag + stronger jitter)
-            x2 += (x - x2) * 0.12;
-            y2 += (y - y2) * 0.12;
+    g1.style.left = (x1 + (Math.random() - 0.5) * 4) + "px";
+    g1.style.top  = (y1 + (Math.random() - 0.5) * 4) + "px";
 
-            g2.style.left = (x2 + (Math.random() - 0.5) * 10) + "px";
-            g2.style.top  = (y2 + (Math.random() - 0.5) * 10) + "px";
+    // second echo (slower + more unstable)
+    x2 += (x - x2) * 0.12;
+    y2 += (y - y2) * 0.12;
 
-            requestAnimationFrame(animate);
-        }
+    g2.style.left = (x2 + (Math.random() - 0.5) * 8) + "px";
+    g2.style.top  = (y2 + (Math.random() - 0.5) * 8) + "px";
 
-        animate();
-    </script>
+    requestAnimationFrame(animate);
+}
+
+animate();
+</script>
 
 </body>
 </html>
