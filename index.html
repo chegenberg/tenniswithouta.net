@@ -31,18 +31,17 @@ body {
     text-align: center;
 }
 
-/* 🔥 DOUBLED CURSOR SIZE */
 .cursor {
     position: fixed;
     width: 24px;
     height: 24px;
-    background: #ffff00;
+    background: rgb(255,255,0);
     border-radius: 50%;
     pointer-events: none;
     transform: translate(-50%, -50%);
+    box-shadow: 0 0 12px rgba(255, 200, 0, 0.8);
 }
 
-/* echoes scaled to match */
 .echo {
     position: fixed;
     width: 24px;
@@ -51,7 +50,6 @@ body {
     pointer-events: none;
     transform: translate(-50%, -50%);
 }
-
 </style>
 </head>
 
@@ -68,7 +66,6 @@ body {
 const cursor = document.querySelector(".cursor");
 
 const COUNT = 18;
-
 const SPRING = 0.16;
 const DAMPING = 0.62;
 
@@ -97,10 +94,6 @@ document.addEventListener("mousemove", (e) => {
     mouseY = e.clientY;
 });
 
-function lerp(a, b, t) {
-    return a + (b - a) * t;
-}
-
 function animate() {
 
     cursor.style.left = mouseX + "px";
@@ -127,20 +120,16 @@ function animate() {
         e.x += e.vx;
         e.y += e.vy;
 
-        const dx = mouseX - e.x;
-        const dy = mouseY - e.y;
-        const dist = Math.sqrt(dx * dx + dy * dy);
-
-        const t = Math.min(1, dist / 220);
+        const p = i / (COUNT - 1);
 
         e.el.style.left = e.x + "px";
         e.el.style.top = e.y + "px";
 
-        e.el.style.background = `rgb(${255 * t},${255 * t},0)`;
+        const brightness = 1 - p;
 
-        e.el.style.opacity = 0.95 - (i / COUNT) * 0.6;
-
-        e.el.style.boxShadow = `0 0 ${t * 10}px rgba(255,200,0,0.5)`;
+        e.el.style.background = `rgb(255, ${255 * brightness}, 0)`;
+        e.el.style.opacity = 1 - p * 0.85;
+        e.el.style.boxShadow = `0 0 ${8 * (1 - p)}px rgba(255, 200, 0, ${0.6 * (1 - p)})`;
     }
 
     requestAnimationFrame(animate);
